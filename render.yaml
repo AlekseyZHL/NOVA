@@ -1,0 +1,30 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# IMPORTANT: VAULT_KEY / SESSION_SECRET are deliberately NOT set here.
+# The app generates data/*.key on the persistent disk below. Back that disk
+# up offline, or set both variables manually to 64 hex chars from your KMS.
+services:
+  - type: web
+    name: nova-wallet
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    healthCheckPath: /healthz
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: ALLOW_MAINNET
+        value: "false"
+      - key: DEMO_AUTH
+        value: "true"
+      - key: BOT_TOKEN
+        sync: false
+      - key: WEBAPP_URL
+        sync: false
+      - key: VAULT_KEY
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+    disk:
+      name: nova-data
+      mountPath: /app/data
+      sizeGB: 1

@@ -1,0 +1,28 @@
+name: ✨ Предложить функцию
+description: Идея по улучшению NOVA Wallet
+title: "[FEAT] "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую проблему решаем
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Предлагаемое решение
+    validations:
+      required: true
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Затрагивает ли это хранение ключей или подпись транзакций?
+      options: ["Нет", "Да — нужен аудит"]
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Альтернативы

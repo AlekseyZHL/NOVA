@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version without leading v (e.g. 1.0.1)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm run setup
+      - run: npm test
+      - name: Build secret-free archives
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [ -z "$VERSION" ]; then VERSION="${GITHUB_REF_NAME#v}"; fi
+          python3 scripts/build_release.py "$VERSION"
+          ls -lh exports/*.zip
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: exports/NOVA-Wallet-*-source.zip
+          generate_release_notes: true
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nova-wallet-backup
+          path: exports/NOVA-Wallet-*-backup-*.zip

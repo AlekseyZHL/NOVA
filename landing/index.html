@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NOVA Wallet — мультичейн-кошелёк без сид-фразы</title>
+<meta name="description" content="NOVA Wallet — кастодиальный мультичейн Telegram Mini App: 6 тестовых сетей, настоящая криптография, симуляция каждой транзакции до подписи. Testnet MVP, без аудита.">
+<meta name="theme-color" content="#070b14">
+<meta property="og:title" content="NOVA Wallet — мультичейн без сид-фразы">
+<meta property="og:description" content="6 тестовых сетей, реальная криптография, симуляция до подписи. Testnet MVP.">
+<meta property="og:image" content="og-image.svg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#070b14; --bg2:#0c1122; --card:rgba(255,255,255,.045); --line:rgba(255,255,255,.1);
+    --txt:#eef2ff; --mut:#8e9ac0; --brand:#7c5cff; --brand2:#a78bfa; --cyan:#22d3ee;
+    --green:#34d399; --amber:#fbbf24; --red:#fb7185; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.6;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+  .grad{background:linear-gradient(100deg,var(--brand2),var(--brand) 45%,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* ---------- background ---------- */
+  .bg{position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background:radial-gradient(900px 600px at 85% -5%,rgba(124,92,255,.22),transparent 65%),
+               radial-gradient(700px 500px at -5% 45%,rgba(34,211,238,.12),transparent 60%),
+               linear-gradient(180deg,#070b14,#080d1b 55%,#070b14)}
+  .bg::after{content:"";position:absolute;inset:0;opacity:.4;
+    background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+    background-size:48px 48px;mask-image:linear-gradient(180deg,#000,transparent 75%)}
+
+  /* ---------- nav ---------- */
+  nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(18px);background:rgba(7,11,20,.72);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;gap:28px;height:68px}
+  .logo{display:flex;align-items:center;gap:11px;font-weight:800;font-size:19px;letter-spacing:-.4px}
+  .logo svg{width:34px;height:34px}
+  .navlinks{display:flex;gap:26px;margin-left:auto;font-size:14px;color:var(--mut)}
+  .navlinks a:hover{color:var(--txt)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 20px;border-radius:12px;
+       font-weight:700;font-size:14px;border:1px solid transparent;cursor:pointer;transition:.2s;white-space:nowrap}
+  .btn-primary{background:linear-gradient(100deg,var(--brand2),var(--brand));color:#fff;box-shadow:0 8px 28px rgba(124,92,255,.34)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(124,92,255,.5)}
+  .btn-ghost{border-color:var(--line);background:rgba(255,255,255,.045)}
+  .btn-ghost:hover{border-color:var(--brand2);background:rgba(124,92,255,.12)}
+  .btn-sm{padding:8px 13px;font-size:13px}
+  @media(max-width:820px){.navlinks{display:none}}
+
+  /* ---------- hero ---------- */
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding:84px 0 72px}
+  @media(max-width:900px){.hero{grid-template-columns:1fr;gap:44px;padding:56px 0 40px;text-align:center}}
+  .pill{display:inline-flex;align-items:center;gap:9px;padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;
+        letter-spacing:.08em;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.08);color:#fcd34d}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber)}
+  h1{font-size:clamp(38px,5.2vw,64px);line-height:1.06;letter-spacing:-2px;margin:22px 0 18px;font-weight:850}
+  .lead{font-size:18px;color:var(--mut);max-width:540px;margin:0 0 28px}
+  @media(max-width:900px){.lead{margin-left:auto;margin-right:auto}}
+  .cta{display:flex;gap:12px;flex-wrap:wrap}
+  @media(max-width:900px){.cta{justify-content:center}}
+  .meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:26px;font-size:13px;color:var(--mut)}
+  @media(max-width:900px){.meta{justify-content:center}}
+  .meta b{color:var(--txt)}
+
+  /* ---------- phone ---------- */
+  .phone-stage{position:relative;display:flex;justify-content:center}
+  .phone{width:320px;height:640px;border-radius:42px;padding:11px;position:relative;
+    background:linear-gradient(150deg,#2b2352,#101728 45%,#0a1220);
+    border:1px solid rgba(255,255,255,.16);box-shadow:0 40px 90px rgba(0,0,0,.65),0 0 90px rgba(124,92,255,.2)}
+  .phone::before{content:"";position:absolute;top:20px;left:50%;transform:translateX(-50%);width:90px;height:20px;border-radius:99px;background:#050810;z-index:3}
+  .screen{height:100%;border-radius:33px;background:linear-gradient(180deg,#0d1224,#080d1a);overflow:hidden;display:flex;flex-direction:column;position:relative}
+  .phead{display:flex;align-items:center;gap:10px;padding:34px 16px 12px}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--cyan));display:grid;place-items:center;font-weight:800;font-size:13px}
+  .phead .nm{font-size:12px;font-weight:700}
+  .phead .sb{font-size:10px;color:var(--mut)}
+  .chainchip{margin-left:auto;font-size:9px;font-weight:800;letter-spacing:.1em;padding:4px 8px;border-radius:99px;background:rgba(251,191,36,.12);color:#fcd34d;border:1px solid rgba(251,191,36,.3)}
+  .pbody{flex:1;overflow:auto;padding:4px 16px 12px;scrollbar-width:none}
+  .pbody::-webkit-scrollbar{display:none}
+  .view{display:none;animation:fade .28s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .balance-card{border-radius:20px;padding:18px;background:linear-gradient(135deg,rgba(124,92,255,.28),rgba(34,211,238,.09));border:1px solid rgba(124,92,255,.32)}
+  .lbl{font-size:10px;color:#b9c4e8;letter-spacing:.05em;text-transform:uppercase}
+  .bigbal{font-size:32px;font-weight:800;letter-spacing:-1.2px;margin:6px 0 4px}
+  .delta{font-size:11px;color:var(--green);font-weight:700}
+  .actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
+  .action{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:11px 3px;text-align:center;cursor:pointer;transition:.18s}
+  .action:hover{background:rgba(124,92,255,.2);transform:translateY(-2px)}
+  .action .ic{font-size:17px;display:block;line-height:1}
+  .action .tx{font-size:9px;color:var(--mut);margin-top:6px;display:block}
+  .sect{font-size:11px;font-weight:800;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;margin:16px 0 9px}
+  .asset{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .coin{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;flex:none}
+  .asset .a1{font-size:12px;font-weight:700}
+  .asset .a2{font-size:10px;color:var(--mut)}
+  .asset .amt{margin-left:auto;text-align:right;font-size:12px;font-weight:700}
+  .asset .amt small{display:block;font-size:9px;color:var(--mut);font-weight:500}
+  .pnav{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:rgba(5,9,18,.85);padding:7px 4px 13px}
+  .tab{background:none;border:0;color:var(--mut);font-size:9px;cursor:pointer;padding:5px 0;font-family:var(--sans)}
+  .tab.on{color:var(--brand2)}
+  .tab .ti{display:block;font-size:16px;margin-bottom:3px}
+  .field{margin:12px 0}
+  .field label{font-size:10px;color:var(--mut);display:block;margin-bottom:6px}
+  .field input,.field select{width:100%;padding:11px 12px;border-radius:11px;border:1px solid var(--line);
+    background:rgba(255,255,255,.05);color:var(--txt);font-size:12px;font-family:var(--sans);outline:none}
+  .field input:focus,.field select:focus{border-color:var(--brand)}
+  .btnfull{width:100%;padding:12px;border:0;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer;
+    background:linear-gradient(100deg,var(--brand2),var(--brand));color:#fff;font-family:var(--sans)}
+  .qr{width:150px;height:150px;margin:16px auto 10px;background:#fff;padding:9px;border-radius:12px;display:block}
+  .addrbox{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:11px;padding:11px;
+    font-family:var(--mono);font-size:10px;word-break:break-all;color:#c9d4ff;text-align:center}
+  .check{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:11px}
+  .check .ok{color:var(--green);font-weight:800}
+  .sheet{position:absolute;inset:0;background:rgba(4,7,14,.86);backdrop-filter:blur(6px);z-index:5;display:none;
+    align-items:flex-end;padding:12px}
+  .sheet.show{display:flex}
+  .sheet-in{width:100%;background:#121a30;border:1px solid var(--line);border-radius:22px;padding:18px;animation:up .3s ease}
+  @keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+  .kv{display:flex;justify-content:space-between;font-size:11px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+  .kv span:first-child{color:var(--mut)}
+  .toast{position:absolute;left:50%;bottom:74px;transform:translateX(-50%);background:#1b2745;border:1px solid var(--brand);
+    padding:9px 15px;border-radius:99px;font-size:11px;white-space:nowrap;opacity:0;transition:.3s;z-index:8}
+  .toast.show{opacity:1;bottom:82px}
+
+  /* ---------- sections ---------- */
+  section{padding:76px 0}
+  .eyebrow{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--brand2);margin-bottom:12px}
+  h2{font-size:clamp(28px,3.6vw,42px);letter-spacing:-1.2px;line-height:1.15;margin:0 0 14px}
+  .sub{color:var(--mut);font-size:16px;max-width:660px;margin:0 0 36px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:900px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;transition:.2s}
+  .card:hover{border-color:rgba(124,92,255,.5);transform:translateY(-3px)}
+  .card .ci{font-size:26px;margin-bottom:12px;display:block}
+  .card h3{margin:0 0 8px;font-size:17px}
+  .card p{margin:0;color:var(--mut);font-size:14px}
+  .strip{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:34px}
+  .chip{padding:9px 16px;border:1px solid var(--line);border-radius:99px;font-size:13px;color:var(--mut);background:rgba(255,255,255,.03)}
+  .chip b{color:var(--txt)}
+
+  .notice{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+  @media(max-width:900px){.notice{grid-template-columns:1fr}}
+  .warnbox{background:linear-gradient(140deg,rgba(251,113,133,.11),rgba(251,191,36,.06));border:1px solid rgba(251,113,133,.3);border-radius:22px;padding:28px}
+  .okbox{background:linear-gradient(140deg,rgba(52,211,153,.1),rgba(34,211,238,.05));border:1px solid rgba(52,211,153,.25);border-radius:22px;padding:28px}
+  ul.clean{list-style:none;padding:0;margin:16px 0 0}
+  ul.clean li{padding:7px 0 7px 24px;position:relative;font-size:14px;color:#d5ddf5}
+  ul.clean li::before{content:"";position:absolute;left:2px;top:15px;width:8px;height:8px;border-radius:50%;background:var(--brand2)}
+  .okbox ul.clean li::before{background:var(--green)}
+
+  .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch;margin-top:30px}
+  @media(max-width:900px){.flow{grid-template-columns:1fr}}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;position:relative}
+  .step .num{font-family:var(--mono);font-size:11px;color:var(--cyan);font-weight:800}
+  .step h4{margin:8px 0 6px;font-size:13px}
+  .step p{margin:0;font-size:11px;color:var(--mut);line-height:1.5}
+  .step:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:42%;color:var(--brand2);font-weight:800;z-index:2}
+  @media(max-width:900px){.step:not(:last-child)::after{content:"↓";right:16px;top:auto;bottom:-16px}}
+
+  pre{background:#080d1b;border:1px solid var(--line);border-radius:18px;padding:22px;overflow:auto;
+      font-family:var(--mono);font-size:13px;line-height:1.8;color:#d9e2ff;margin:0}
+  pre .c{color:#6b78a3}
+  pre .k{color:var(--brand2)}
+  .code-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .code-head .dots{display:flex;gap:6px}
+  .code-head i{width:10px;height:10px;border-radius:50%;background:#fb7185}
+  .code-head i:nth-child(2){background:#fbbf24}.code-head i:nth-child(3){background:#34d399}
+  .code-head span{margin-left:8px;color:var(--mut);font-size:12px}
+  .copy{margin-left:auto}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+  .deploy{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px}
+  .deploy h3{margin:0 0 6px;font-size:18px}
+  .deploy p{color:var(--mut);font-size:13px;margin:0 0 14px}
+  .deploy code{font-family:var(--mono);font-size:11px;background:rgba(124,92,255,.14);padding:3px 7px;border-radius:6px;color:#c9bfff}
+
+  footer{border-top:1px solid var(--line);padding:38px 0 60px;color:var(--mut);font-size:13px}
+  .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+  .foot a:hover{color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<nav><div class="wrap nav">
+  <a href="#top" class="logo">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="#0c1024"/><path d="M16 46V18l32 28V18" fill="none" stroke="url(#lg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    NOVA <span class="grad">Wallet</span>
+  </a>
+  <div class="navlinks">
+    <a href="#try">Демо</a><a href="#features">Возможности</a><a href="#security">Безопасность</a>
+    <a href="#arch">Архитектура</a><a href="#start">Запуск</a>
+    <a href="https://github.com/AlekseyZHL/NOVA">GitHub ↗</a>
+  </div>
+  <a class="btn btn-primary btn-sm" href="https://t.me/crptNOVA_bot">Открыть в Telegram ↗</a>
+</div></nav>
+
+<!-- HERO -->
+<div class="wrap" id="top">
+  <div class="hero">
+    <div>
+      <div class="pill"><span class="dot"></span> TESTNET MVP · БЕЗ АУДИТА · КАСТОДИАЛЬНЫЙ</div>
+      <h1>Криптокошелёк,<br><span class="grad">в который не нужно</span><br>вписывать 12 слов</h1>
+      <p class="lead">NOVA Wallet — мультичейн Mini App для Telegram. Вход по вашей Telegram-личности,
+        реальные ключи BIP-39/BIP-32/SLIP-0010, шесть тестовых сетей и <b>симуляция каждой транзакции до подписи</b>.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://t.me/crptNOVA_bot">🚀 Открыть в Telegram</a>
+        <a class="btn btn-ghost" href="https://github.com/AlekseyZHL/NOVA">⭐ Исходный код</a>
+      </div>
+      <div class="meta">
+        <span><b>6</b> сетей</span><span><b>48</b> тестов</span>
+        <span><b>MIT</b> лицензия</span><span>Node <b>20+</b></span>
+      </div>
+    </div>
+
+    <!-- interactive phone -->
+    <div class="phone-stage" id="try">
+      <div class="phone"><div class="screen">
+        <div class="phead">
+          <div class="avatar">N</div>
+          <div><div class="nm">NOVA Wallet</div><div class="sb" id="modeLabel">Демо-режим · TESTNET</div></div>
+          <div class="chainchip">SIM</div>
+        </div>
+
+        <div class="pbody">
+          <!-- HOME -->
+          <div class="view active" id="v-home">
+            <div class="balance-card">
+              <div class="lbl">Общий баланс</div>
+              <div class="bigbal" id="balVal">€3 623.24</div>
+              <div class="delta" id="balDelta">▲ +2.14% за 24 ч · демо-данные</div>
+            </div>
+            <div class="actions">
+              <div class="action" data-go="send"><span class="ic">↗</span><span class="tx">Отправить</span></div>
+              <div class="action" data-go="receive"><span class="ic">↙</span><span class="tx">Получить</span></div>
+              <div class="action" data-go="send"><span class="ic">⇄</span><span class="tx">Обмен</span></div>
+              <div class="action" data-go="security"><span class="ic">🛡</span><span class="tx">Защита</span></div>
+            </div>
+            <div class="sect">Активы · 6 сетей</div>
+            <div id="assetList"></div>
+          </div>
+
+          <!-- SEND -->
+          <div class="view" id="v-send">
+            <h3 style="font-size:16px;margin:8px 0 2px">Отправить</h3>
+            <p style="font-size:11px;color:var(--mut);margin:0">Сначала симуляция — подпись только после подтверждения.</p>
+            <div class="field"><label>Сеть / актив</label>
+              <select id="sendAsset"><option>Ethereum Sepolia · ETH</option><option>Base Sepolia · ETH</option><option>Polygon Amoy · POL</option><option>Bitcoin Testnet4 · BTC</option><option>Solana Devnet · SOL</option></select>
+            </div>
+            <div class="field"><label>Адрес получателя</label><input id="sendTo" value="0x8Ba1f109551bD432803012645Ac136ddd64DBA72"></div>
+            <div class="field"><label>Сумма</label><input id="sendAmt" value="0.05" inputmode="decimal"></div>
+            <button class="btnfull" id="simBtn">🔍 Симулировать транзакцию</button>
+          </div>
+
+          <!-- RECEIVE -->
+          <div class="view" id="v-receive">
+            <h3 style="font-size:16px;margin:8px 0 2px">Получить</h3>
+            <p style="font-size:11px;color:var(--mut);margin:0">Только тестовые монеты.</p>
+            <svg class="qr" id="qr" viewBox="0 0 25 25" shape-rendering="crispEdges" aria-label="QR-код адреса"></svg>
+            <div class="addrbox" id="addrText">0xf8dD012DfAd7629F54e27e18A87C229Ae8dED195</div>
+            <button class="btnfull" style="margin-top:12px" id="copyBtn">📋 Скопировать адрес</button>
+          </div>
+
+          <!-- SECURITY -->
+          <div class="view" id="v-security">
+            <h3 style="font-size:16px;margin:8px 0 2px">Уровень защиты</h3>
+            <p style="font-size:11px;color:var(--mut);margin:0 0 12px">Проверки выполняются до подписи.</p>
+            <div class="check"><span class="ok">✓</span> Seed в AES-256-GCM</div>
+            <div class="check"><span class="ok">✓</span> HMAC-подтверждение, TTL 120 с</div>
+            <div class="check"><span class="ok">✓</span> Лимит $250 / $1000 в день</div>
+            <div class="check"><span class="ok">✓</span> Белый список адресов</div>
+            <div class="check"><span class="ok">✓</span> Блокировка address poisoning</div>
+            <div class="check"><span class="ok">✓</span> Симуляция газа и UTXO</div>
+            <div class="check"><span class="ok">✓</span> Аудит-лог всех операций</div>
+          </div>
+        </div>
+
+        <!-- bottom nav -->
+        <div class="pnav">
+          <button class="tab on" data-tab="home"><span class="ti">⌂</span>Главная</button>
+          <button class="tab" data-tab="send"><span class="ti">↗</span>Отправить</button>
+          <button class="tab" data-tab="receive"><span class="ti">⊙</span>Получить</button>
+          <button class="tab" data-tab="security"><span class="ti">🛡</span>Защита</button>
+        </div>
+
+        <!-- confirm sheet -->
+        <div class="sheet" id="sheet"><div class="sheet-in">
+          <div style="font-size:13px;font-weight:800;margin-bottom:4px">Подтвердите перевод</div>
+          <div style="font-size:10px;color:var(--mut);margin-bottom:12px">Симуляция пройдена · токен действителен 120 с</div>
+          <div class="kv"><span>Сеть</span><span id="sNet">Ethereum Sepolia</span></div>
+          <div class="kv"><span>Сумма</span><span id="sAmt">0.05 ETH</span></div>
+          <div class="kv"><span>Комиссия</span><span>≈ 0.00021 ETH</span></div>
+          <div class="kv"><span>Метод</span><span>native transfer</span></div>
+          <div class="kv"><span>Риск</span><span style="color:var(--green)">низкий ✓</span></div>
+          <button class="btnfull" style="margin-top:14px" id="confirmBtn">✅ Подписать и отправить</button>
+          <button class="btnfull" style="margin-top:8px;background:rgba(255,255,255,.08)" id="cancelBtn">Отмена</button>
+        </div></div>
+        <div class="toast" id="toast"></div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features"><div class="wrap">
+  <div class="eyebrow">ВОЗМОЖНОСТИ</div>
+  <h2>Настоящая криптография,<br>а не «демо-кошелёк»</h2>
+  <p class="sub">Ключи выводятся детерминированно, подписи можно проверить в любом эксплорере,
+    а каждая отправка проходит через симуляцию и риск-движок.</p>
+  <div class="cards">
+    <div class="card"><span class="ci">🔐</span><h3>Seedless-вход</h3><p>Telegram <code>initData</code> проверяется по HMAC-SHA256 и <code>timingSafeEqual</code>. Дальше — зашифрованный вывод ключа по индексу пользователя. Есть запасной путь через <code>#tgWebAppData</code>.</p></div>
+    <div class="card"><span class="ci">🌐</span><h3>Шесть тестовых сетей</h3><p>Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia, Polygon Amoy, Bitcoin Testnet4, Solana Devnet — живые балансы и курсы CoinGecko.</p></div>
+    <div class="card"><span class="ci">✍️</span><h3>Реальные подписи</h3><p>ECDSA через ethers v6, PSBT/P2WPKH через bitcoinjs-lib, ed25519 через @solana/web3.js. Поддерживается ERC-20 USDC.</p></div>
+    <div class="card"><span class="ci">🧠</span><h3>Симуляция до подписи</h3><p><code>/api/simulate</code> считает газ/UTXO и возвращает HMAC-токен. <code>/api/send</code> сверяет параметры и повторяет проверки — подменить сумму нельзя.</p></div>
+    <div class="card"><span class="ci">🛡</span><h3>Риск-движок</h3><p>Лимиты в USD, белый список адресов, блокировка address poisoning, декодирование метода контракта, аудит-лог.</p></div>
+    <div class="card"><span class="ci">📱</span><h3>UX как в приложении</h3><p>Пять экранов, тема Telegram, QR-приём и сканер, своп, история, песочница, адресная книга, антифишинг-код, €/$.</p></div>
+  </div>
+  <div class="strip">
+    <div class="chip"><b>BIP-39</b> 24 слова</div><div class="chip"><b>AES-256-GCM</b> vault</div>
+    <div class="chip"><b>SLIP-0010</b> ed25519</div><div class="chip"><b>48</b> автотестов</div>
+    <div class="chip"><b>Docker</b> + CI</div><div class="chip"><b>MIT</b></div>
+  </div>
+</div></section>
+
+<!-- SECURITY -->
+<section id="security"><div class="wrap">
+  <div class="eyebrow">ЧЕСТНО О РИСКАХ</div>
+  <h2>Это MVP. И мы это не скрываем.</h2>
+  <div class="notice">
+    <div class="warnbox">
+      <h3 style="margin:0 0 6px">🔴 Что НЕ готово</h3>
+      <p style="color:var(--mut);font-size:14px;margin:0">Проект не проходил независимый аудит. Ключи хранятся на сервере — компрометация сервера означает компрометацию всех кошельков.</p>
+      <ul class="clean">
+        <li>Нет KMS/HSM — master seed в зашифрованном файле</li>
+        <li>Нет PostgreSQL — конкурентная запись в JSON-файл</li>
+        <li>Нет rate limiting и настоящего MPC / соцвосстановления</li>
+        <li>Mainnet-своп отключён (<code>501</code>) до аудированного агрегатора</li>
+        <li><b>Не используйте для реальных средств.</b></li>
+      </ul>
+    </div>
+    <div class="okbox">
+      <h3 style="margin:0 0 6px">🟢 Что уже есть</h3>
+      <p style="color:var(--mut);font-size:14px;margin:0">Криптография построена на проверенных библиотеках и покрыта офлайн-тестами, которым не нужны ни сеть, ни деньги.</p>
+      <ul class="clean">
+        <li>28 криптотестов: деривация, подписи всех трёх цепей, HMAC</li>
+        <li>16 UI-тестов в jsdom + 4 теста запасного входа</li>
+        <li>Поддельная подпись и подмена <code>confirmToken</code> отклоняются</li>
+        <li>Секреты не попадают в Git: <code>.gitignore</code> + проверка в CI</li>
+        <li>Mainnet выключен (<code>ALLOW_MAINNET=false</code>)</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- ARCHITECTURE -->
+<section id="arch"><div class="wrap">
+  <div class="eyebrow">АРХИТЕКТУРА</div>
+  <h2>Пять шагов от нажатия до подписи</h2>
+  <p class="sub">Ни одна транзакция не подписывается «вслепую»: между намерением пользователя и приватным ключом стоят проверки.</p>
+  <div class="flow">
+    <div class="step"><div class="num">01</div><h4>Вход</h4><p>Telegram WebApp передаёт initData → HMAC-проверка → сессия на 7 дней.</p></div>
+    <div class="step"><div class="num">02</div><h4>Симуляция</h4><p>Оценка газа / UTXO, декодирование метода, расчёт комиссии.</p></div>
+    <div class="step"><div class="num">03</div><h4>Риск-движок</h4><p>Лимиты, белый список, anti-poisoning. Возвращает HMAC-токен на 120 с.</p></div>
+    <div class="step"><div class="num">04</div><h4>Подтверждение</h4><p>Повторная сверка суммы, адреса и сети. Подмена = отказ.</p></div>
+    <div class="step"><div class="num">05</div><h4>Подпись и эфир</h4><p>Vault расшифровывает seed, адаптер подписывает и транслирует в RPC.</p></div>
+  </div>
+  <div class="strip">
+    <div class="chip">EVM <b>m/44'/60'/0'/0/i</b></div>
+    <div class="chip">BTC <b>m/84'/coin'/0'/0/i</b></div>
+    <div class="chip">SOL <b>m/44'/501'/i'/0'</b></div>
+  </div>
+</div></section>
+
+<!-- QUICK START -->
+<section id="start"><div class="wrap">
+  <div class="eyebrow">ЗАПУСК</div>
+  <h2>Три команды до работающего кошелька</h2>
+  <p class="sub">Никаких API-ключей для старта: тестовые RPC и курсы CoinGecko работают сразу. Telegram-бот подключается отдельно.</p>
+  <div class="code-head">
+    <div class="dots"><i></i><i></i><i></i></div><span>terminal</span>
+    <button class="btn btn-ghost btn-sm copy" id="copyCode">📋 Копировать</button>
+  </div>
+  <pre id="codeBlock"><span class="c"># клонируем и ставим зависимости</span>
+git clone https://github.com/AlekseyZHL/NOVA.git
+<span class="k">cd</span> NOVA &amp;&amp; npm ci
+
+<span class="c"># создаём .env с VAULT_KEY и SESSION_SECRET</span>
+npm run setup
+npm start
+
+<span class="c"># в другом терминале — 48 проверок</span>
+npm test &amp;&amp; npm run test:ui &amp;&amp; npm run test:entry
+
+<span class="c"># или одной командой</span>
+make ci</pre>
+  <div class="grid2" style="margin-top:24px">
+    <div class="deploy"><h3>🐳 Docker</h3><p>Образ на Node 20 Alpine, непривилегированный пользователь, healthcheck на <code>/healthz</code> и том для ключей.</p><code>docker compose up -d --build</code></div>
+    <div class="deploy"><h3>☁️ Один клик</h3><p>Готовые конфиги для Render, Railway и Fly.io. Лендинг публикуется на GitHub Pages автоматически.</p><code>render.yaml · railway.json · fly.toml</code></div>
+  </div>
+  <div class="cta" style="margin-top:28px">
+    <a class="btn btn-primary" href="https://github.com/AlekseyZHL/NOVA">📖 Документация на GitHub</a>
+    <a class="btn btn-ghost" href="https://github.com/AlekseyZHL/NOVA/blob/main/docs/DEPLOYMENT.md">☁️ Гайд по деплою</a>
+  </div>
+</div></section>
+
+<footer><div class="wrap foot">
+  <div>© 2026 NOVA Wallet contributors · <a href="https://github.com/AlekseyZHL/NOVA/blob/main/LICENSE">MIT</a> · <b>TESTNET ONLY</b></div>
+  <div><a href="https://github.com/AlekseyZHL/NOVA/blob/main/SECURITY.md">Security</a> ·
+       <a href="https://github.com/AlekseyZHL/NOVA/blob/main/CONTRIBUTING.md">Contributing</a> ·
+       <a href="https://t.me/crptNOVA_bot">Telegram bot</a></div>
+</div></footer>
+
+<script>
+(function(){
+  var assets=[
+    {n:'Ethereum',s:'Sepolia · ETH',a:'1.204 ETH',u:'€2 833',c:'#7b8cff',g:'Ξ'},
+    {n:'Bitcoin',s:'Testnet4 · BTC',a:'0.0081 BTC',u:'€652',c:'#f7931a',g:'₿'},
+    {n:'Solana',s:'Devnet · SOL',a:'1.35 SOL',u:'€137',c:'#14f195',g:'◎'},
+    {n:'Base',s:'Sepolia · ETH',a:'0 ETH',u:'€0',c:'#3b82f6',g:'B'},
+    {n:'Polygon',s:'Amoy · POL',a:'0 POL',u:'€0',c:'#a377f7',g:'P'},
+    {n:'Arbitrum',s:'Sepolia · ETH',a:'0 ETH',u:'€0',c:'#28a0f0',g:'A'}
+  ];
+  document.getElementById('assetList').innerHTML=assets.map(function(x){
+    return '<div class="asset"><div class="coin" style="background:'+x.c+'">'+x.g+'</div>'+
+      '<div><div class="a1">'+x.n+'</div><div class="a2">'+x.s+'</div></div>'+
+      '<div class="amt">'+x.a+'<small>'+x.u+'</small></div></div>';
+  }).join('');
+
+  function show(tab){
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});
+    document.getElementById('v-'+tab).classList.add('active');
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('on',t.dataset.tab===tab)});
+  }
+  document.querySelectorAll('.tab').forEach(function(t){t.onclick=function(){show(t.dataset.tab)}});
+  document.querySelectorAll('[data-go]').forEach(function(b){b.onclick=function(){show(b.dataset.go)}});
+
+  var toast=document.getElementById('toast'),timer;
+  function say(msg){toast.textContent=msg;toast.classList.add('show');clearTimeout(timer);timer=setTimeout(function(){toast.classList.remove('show')},2200)}
+  function copy(text,msg){
+    try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text);say(msg);return}}
+    catch(e){}
+    try{var i=document.createElement('textarea');i.value=text;document.body.appendChild(i);i.select();document.execCommand('copy');i.remove();say(msg)}catch(e){say('Скопируйте вручную')}
+  }
+
+  // deterministic pseudo-QR (visual demo, not a scannable code)
+  (function(){
+    var s='nova-wallet-testnet-address',bits='',size=25,out='';
+    for(var i=0;i<s.length;i++){var v=s.charCodeAt(i);for(var j=0;j<8;j++)bits+=((v>>(7-j))&1)}
+    for(var y=0;y<size;y++)for(var x=0;x<size;x++){
+      var finder=(x<7&&y<7)||(x>size-8&&y<7)||(x<7&&y>size-8);
+      if(finder)continue;
+      var k=(y*size+x)%bits.length,on=bits[k]==='1'&&((x+y)%3!==0);
+      if(on)out+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="#070b14"/>';
+    }
+    function finderBox(px,py){
+      return '<rect x="'+px+'" y="'+py+'" width="7" height="7" fill="#070b14"/>'+
+             '<rect x="'+(px+1)+'" y="'+(py+1)+'" width="5" height="5" fill="#fff"/>'+
+             '<rect x="'+(px+2)+'" y="'+(py+2)+'" width="3" height="3" fill="#070b14"/>';
+    }
+    document.getElementById('qr').innerHTML=out+finderBox(0,0)+finderBox(18,0)+finderBox(0,18);
+  })();
+
+  document.getElementById('copyBtn').onclick=function(){copy(document.getElementById('addrText').textContent,'Адрес скопирован ✓')};
+  document.getElementById('copyCode').onclick=function(){copy(document.getElementById('codeBlock').innerText,'Команды скопированы ✓')};
+
+  var sheet=document.getElementById('sheet');
+  document.getElementById('simBtn').onclick=function(){
+    document.getElementById('sNet').textContent=document.getElementById('sendAsset').value.split(' · ')[0];
+    document.getElementById('sAmt').textContent=document.getElementById('sendAmt').value+' '+document.getElementById('sendAsset').value.split(' · ')[1];
+    sheet.classList.add('show');
+  };
+  document.getElementById('cancelBtn').onclick=function(){sheet.classList.remove('show')};
+  document.getElementById('confirmBtn').onclick=function(){
+    sheet.classList.remove('show');show('home');say('✅ Симуляция подтверждена (демо)');
+  };
+
+  // hide balances toggle
+  var hidden=false,bal=document.getElementById('balVal');
+  bal.style.cursor='pointer';
+  bal.onclick=function(){hidden=!hidden;bal.textContent=hidden?'••••••':'€3 623.24';document.getElementById('balDelta').style.visibility=hidden?'hidden':'visible'};
+})();
+</script>
+</body>
+</html>

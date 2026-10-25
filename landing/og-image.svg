@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#070b14"/><stop offset="1" stop-color="#0d1b33"/></linearGradient>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1050" cy="80" r="380" fill="#7c5cff" opacity="0.16"/>
+  <circle cx="120" cy="600" r="320" fill="#22d3ee" opacity="0.12"/>
+  <g transform="translate(96,150)">
+    <rect width="120" height="120" rx="30" fill="#0c1024" stroke="url(#g)" stroke-width="2"/>
+    <path d="M37 88V33l47 55V33" fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="248" y="235" font-family="Arial,sans-serif" font-size="86" font-weight="800" fill="#f5f7ff">NOVA <tspan fill="url(#g)">Wallet</tspan></text>
+  <text x="254" y="295" font-family="Arial,sans-serif" font-size="27" fill="#aab4d4">Seedless multichain wallet · Telegram Mini App</text>
+  <text x="254" y="360" font-family="Arial,sans-serif" font-size="20" fill="#8e9ac0">6 testnets · real cryptography · simulate before signing</text>
+  <rect x="252" y="400" width="230" height="44" rx="22" fill="#7c5cff" opacity="0.16" stroke="#7c5cff" stroke-opacity="0.6"/>
+  <text x="274" y="429" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#d9cfff" letter-spacing="1.5">TESTNET · UNAUDITED</text>
+</svg>

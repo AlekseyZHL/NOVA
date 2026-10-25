@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate dev .env
+        run: npm run setup
+
+      - name: Secret scan
+        run: bash scripts/check-secrets.sh
+
+      - name: Syntax check
+        run: |
+          for f in $(find server public scripts tests -name '*.js'); do node --check "$f"; done
+
+      - name: Boot server + full test suite
+        run: |
+          set -e
+          nohup npm start > /tmp/nova.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:3000/healthz > /dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:3000/api/health | head -c 300; echo
+          npm test
+          npm run test:ui
+          npm run test:entry
+
+      - name: Server log
+        if: always()
+        run: tail -60 /tmp/nova.log || true
+
+      - name: Verify no secrets were generated into tracked files
+        if: always()
+        run: bash scripts/check-secrets.sh

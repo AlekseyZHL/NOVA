@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.*
+!.env.example
+data/
+*.key
+vault.enc
+db.json
+*.log
+.DS_Store
+dist/
+coverage/
+
+# Сгенерированные релизные архивы (живут в GitHub Releases и Google Drive)
+exports/
+!.gitignore

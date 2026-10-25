@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔐 Сообщить об уязвимости (приватно)
+    url: https://github.com/AlekseyZHL/NOVA/security/advisories/new
+    about: НЕ открывайте публичный issue для проблем безопасности — см. SECURITY.md.
+  - name: 📚 Документация и деплой
+    url: https://github.com/AlekseyZHL/NOVA#-документация
+    about: Быстрый старт, настройка Telegram, Docker и один-клик деплой.
+  - name: 💬 Вопросы и обсуждения
+    url: https://github.com/AlekseyZHL/NOVA/discussions
+    about: Идеи, вопросы по архитектуре, помощь сообщества.

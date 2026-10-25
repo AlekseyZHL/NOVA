@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.zip binary
+*.svg text
+package-lock.json linguist-generated=true
+landing/** linguist-documentation=true

@@ -1,0 +1,53 @@
+name: 🐛 Сообщить о баге
+description: Что-то сломалось в кошельке, боте или деплое
+title: "[BUG] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **Не вставляйте сюда токены, приватные ключи, сид-фразы или `.env`.**
+        Для уязвимостей используйте приватный Security Advisory.
+  - type: textarea
+    id: what
+    attributes:
+      label: Что произошло
+      description: Опишите проблему и ожидаемое поведение.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+      placeholder: |
+        1. npm ci && npm run setup && npm start
+        2. Открыть ...
+        3. Нажать ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Область
+      options:
+        - Mini App / UI
+        - Telegram bot
+        - Авторизация
+        - Балансы / RPC
+        - Отправка / подпись
+        - Docker / деплой
+        - Документация
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Окружение
+      placeholder: "Node 20.20.2, Ubuntu 24.04, MODE=testnet, сеть = Solana Devnet"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Логи (без секретов)
+      render: shell
