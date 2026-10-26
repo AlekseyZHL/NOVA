@@ -48,7 +48,7 @@ jobs:
         if: steps.pages.outputs.enabled != 'true'
         run: echo "Pages is not enabled yet — deploy skipped. Nothing is broken."
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
         if: steps.pages.outputs.enabled == 'true'
 
       - uses: actions/upload-pages-artifact@v3
