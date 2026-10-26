@@ -1,0 +1,27 @@
+{
+  "name": "NOVA Wallet",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "NOVA Wallet",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "npm ci && npm run setup && npm test",
+  "postStartCommand": "bash .devcontainer/start.sh",
+  "postAttachCommand": "echo '👉 NOVA Wallet: откройте порт 3000 (вкладка PORTS) и сделайте его Public, чтобы Telegram смог открыть Mini App.'",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"],
+      "settings": {
+        "editor.formatOnSave": true,
+        "files.eol": "\n"
+      }
+    }
+  },
+  "remoteUser": "node"
+}

@@ -147,6 +147,33 @@ fly status
 
 ---
 
+## 5a. Запуск на инфраструктуре GitHub
+
+### Codespaces (рекомендуется для быстрого постоянного демо)
+
+1. Откройте https://codespaces.new/AlekseyZHL/NOVA — создастся контейнер с Node 20.
+2. `postCreateCommand` выполнит `npm ci && npm run setup && npm test`.
+3. `.devcontainer/start.sh` подставит в `WEBAPP_URL` адрес вида
+   `https://<codespace>-3000.app.github.dev` и запустит сервер.
+4. Вкладка **PORTS** → порт 3000 → правый клик → **Port Visibility → Public**
+   (иначе Telegram WebView не сможет открыть Mini App).
+5. Скопируйте URL и задайте его в @BotFather через `/setdomain`.
+
+### GitHub Actions: workflow `Live demo`
+
+**Actions → Live demo → Run workflow → выберите 1–5 часов.** Альтернатива без UI: `git tag demo-3h && git push origin demo-3h` (число в теге = часы). Workflow:
+
+- ставит зависимости и генерирует `.env`;
+- поднимает cloudflared quick tunnel (публичный HTTPS без аккаунта);
+- прописывает полученный URL в `WEBAPP_URL` и запускает сервер;
+- публикует ссылку в **Job Summary**, логах, артефакте `nova-live-url` и в ветке [`live-url`](../tree/live-url) файлом `LIVE_URL.md`.
+
+Если добавить секрет `BOT_TOKEN` (`Settings → Secrets and variables → Actions`),
+бот включится и сам зарегистрирует кнопку меню на выданный адрес.
+
+Ограничения: до 5 часов, расходует минуты Actions, URL меняется при каждом запуске,
+`data/` (vault и БД) не сохраняется между запусками. Для постоянного хостинга — разделы 4–6.
+
 ## 6. TLS и reverse proxy (VPS)
 
 NOVA Wallet **не терминирует TLS**. За ним нужен Nginx/Caddy/Traefik.
@@ -222,5 +249,6 @@ wallet.example.com {
 | [`codeql.yml`](../.github/workflows/codeql.yml) | Статический анализ JS/TS, еженедельно |
 | [`pages.yml`](../.github/workflows/pages.yml) | Публикует автономный [`index.html`](../index.html) на GitHub Pages (режим branch и Actions) |
 | [`release.yml`](../.github/workflows/release.yml) | На теге `v*` собирает архивы без секретов и создаёт Release |
+| [`live-demo.yml`](../.github/workflows/live-demo.yml) | Ручной запуск полного приложения на runner с публичным HTTPS-туннелем |
 
 Pages работает в обоих режимах: `Source: Deploy from a branch` (main / root, Jekyll отключён `.nojekyll`) и `Source: GitHub Actions`. Откройте `Settings → Pages` и выберите любой.

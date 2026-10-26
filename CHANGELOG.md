@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [1.0.3] — 26.10.2026 — запуск приложения на GitHub
+
+### Добавлено
+
+- **`.devcontainer/`** — один клик на «Open in Codespaces»: `npm ci`, генерация `.env`, автоматическая подстановка `WEBAPP_URL` из переменных Codespace и запуск сервера с публичным портом 3000.
+- **`.github/workflows/live-demo.yml`** — запуск полного Node-приложения на runner GitHub с публичным HTTPS-туннелем cloudflared (1–5 часов) через `workflow_dispatch` или тег `demo-Nh`. URL публикуется в Job Summary, артефакте `nova-live-url` и ветке `live-url` (`LIVE_URL.md`); при наличии секрета `BOT_TOKEN` включается Telegram-бот.
+- **`scripts/run-live-demo.sh`** + **`scripts/wait-live-demo.sh`** — тот же сценарий для локального запуска.
+- Кнопки Codespaces / Render / Live demo в README и на лендинге; раздел в `docs/DEPLOYMENT.md`.
+
 ## [1.0.2] — 26.10.2026 — Open-source release
 
 ### Добавлено

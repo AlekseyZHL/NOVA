@@ -1,0 +1,113 @@
+name: Live demo
+
+# Поднимает ПОЛНОЕ приложение (Node + бот) прямо на runner GitHub
+# и выдаёт публичный HTTPS-адрес через cloudflared quick tunnel.
+#
+# Запуск (любой из двух):
+#   • Actions → Live demo → Run workflow
+#   • git tag demo-3h && git push origin demo-3h   (число = часы, макс 5)
+#
+# Для ПУБЛИЧНЫХ репозиториев минуты Actions бесплатны.
+on:
+  workflow_dispatch:
+    inputs:
+      hours:
+        description: "Сколько часов держать демо (1–5)"
+        required: true
+        default: "3"
+        type: choice
+        options: ["1", "2", "3", "4", "5"]
+  push:
+    tags: ["demo-*"]
+
+permissions:
+  contents: write     # публикация URL в ветке live-url
+  deployments: write  # публикация URL как GitHub Deployment (читается без токена)
+  actions: read
+
+concurrency:
+  group: live-demo
+  cancel-in-progress: true
+
+jobs:
+  serve:
+    name: NOVA Wallet (live)
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate dev .env
+        run: npm run setup
+
+      - name: Resolve duration
+        id: cfg
+        run: |
+          H="${{ inputs.hours }}"
+          if [ -z "$H" ]; then
+            H="$(echo "${GITHUB_REF_NAME}" | grep -oE '[0-9]+' | head -1 || true)"
+          fi
+          H="${H:-3}"
+          [ "$H" -gt 5 ] 2>/dev/null && H=5
+          echo "hours=$H" >> "$GITHUB_OUTPUT"
+          echo "⏱ Длительность: $H ч"
+
+      - name: Start app + public tunnel
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: bash scripts/run-live-demo.sh "${{ steps.cfg.outputs.hours }}"
+
+      - name: Register live URL as a deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          URL="$(cat /tmp/nova-public-url.txt)"
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/deployments" \
+            -d "{\"ref\":\"${GITHUB_REF_NAME}\",\"environment\":\"live-demo\",\"description\":\"${URL}\",\"auto_merge\":false,\"required_contexts\":[]}" \
+            > /tmp/deployment.json || echo "⚠️  Deployments API недоступен — URL всё равно есть в Job Summary"
+          echo "📡 Deployment зарегистрирован"
+
+      - name: Publish URL to live-url branch
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          URL="$(cat /tmp/nova-public-url.txt)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B live-url
+          printf '# 🚀 NOVA Wallet — живое демо\n\n**%s**\n\nЗапущено: %s (UTC)\n' "$URL" "$(date -u +%Y-%m-%dT%H:%M:%S)" > LIVE_URL.md
+          git add -f LIVE_URL.md
+          git commit -m "chore: publish live demo URL" || echo "  нет изменений"
+          git push -f origin live-url
+          echo "📌 URL опубликован в ветке live-url/LIVE_URL.md"
+
+      - name: Keep alive
+        run: bash scripts/wait-live-demo.sh "${{ steps.cfg.outputs.hours }}"
+
+      - name: Logs & artifact
+        if: always()
+        run: |
+          mkdir -p demo-artifact
+          cp /tmp/nova-public-url.txt demo-artifact/live-url.txt 2>/dev/null || true
+          tail -60 /tmp/nova-server.log > demo-artifact/server.log 2>/dev/null || true
+          tail -30 /tmp/nova-tunnel.log > demo-artifact/tunnel.log 2>/dev/null || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nova-live-url
+          path: demo-artifact/
+          retention-days: 7

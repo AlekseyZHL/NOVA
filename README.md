@@ -5,6 +5,8 @@
 <p align="center">
   <a href="https://github.com/AlekseyZHL/NOVA/actions/workflows/ci.yml"><img src="https://github.com/AlekseyZHL/NOVA/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/AlekseyZHL/NOVA/actions/workflows/codeql.yml"><img src="https://github.com/AlekseyZHL/NOVA/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
+  <a href="https://codespaces.new/AlekseyZHL/NOVA"><img src="https://github.com/codespaces/badge.svg" alt="Open in Codespaces"></a>
+  <a href="https://render.com/deploy?repo=https://github.com/AlekseyZHL/NOVA"><img src="https://render.com/images/deploy-to-render-button.svg" height="20" alt="Deploy to Render"></a>
   <img src="https://img.shields.io/badge/tests-48%20passing-brightgreen" alt="48 tests">
   <img src="https://img.shields.io/badge/node-%3E%3D20-339933?logo=node.js&logoColor=white" alt="Node 20+">
   <img src="https://img.shields.io/badge/mainnet-DISABLED-critical" alt="Mainnet disabled">
@@ -85,6 +87,21 @@ npm run test:entry     # 4 проверки запасного входа чер
 > заголовок `e2b-traffic-access-token`, второй недоступен из WebView. Нужен настоящий HTTPS-домен.
 
 ---
+
+## ☁️ Запуск прямо на GitHub
+
+GitHub Pages отдаёт только статику, поэтому полный Node-бэкенд поднимается одним из трёх способов — всё уже настроено в репозитории:
+
+| Способ | Что даёт | Как запустить |
+|---|---|---|
+| 💻 **Codespaces** | Контейнер на инфраструктуре GitHub, публичный URL порта 3000 | [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/AlekseyZHL/NOVA) → дождаться сборки → вкладка **PORTS** → порт 3000 → **Port Visibility → Public** |
+| ▶️ **Actions: Live demo** | Runner GitHub + публичный HTTPS-туннель, до 5 часов | **Actions → Live demo → Run workflow** — URL появится в Job Summary и в артефакте `nova-live-url` |
+| 🚀 **Render / Railway / Fly** | Постоянный хостинг, привязанный к этому репозиторию | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/AlekseyZHL/NOVA) или см. [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+
+`.devcontainer/` сам ставит зависимости, создаёт `.env`, подставляет `WEBAPP_URL` из переменных Codespace и запускает сервер.
+Чтобы в **Live demo** заработал Telegram-вход, добавьте секрет `BOT_TOKEN` в `Settings → Secrets and variables → Actions` — бот зарегистрирует кнопку меню на выданный туннель.
+
+> ⚠️ Live demo работает до 5 часов и тратит минуты GitHub Actions. Для постоянного адреса используйте Codespaces или PaaS.
 
 ## 🐳 Docker
 
