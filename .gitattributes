@@ -4,4 +4,4 @@
 *.zip binary
 *.svg text
 package-lock.json linguist-generated=true
-landing/** linguist-documentation=true
+index.html linguist-documentation=true

@@ -4,7 +4,10 @@ on:
   push:
     branches: [main, master]
     paths:
-      - "landing/**"
+      - "index.html"
+      - "favicon.svg"
+      - "og-image.svg"
+      - ".nojekyll"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -26,8 +29,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Pages must be enabled once via Settings -> Pages -> Source: GitHub Actions.
-      # Skip gracefully instead of producing a red build before that happens.
+      # The landing page is a single self-contained index.html at the repo root,
+      # plus two SVGs. .nojekyll makes it work with BOTH Pages modes:
+      #   - "Deploy from a branch" (Jekyll disabled, root index.html served as-is)
+      #   - "GitHub Actions"       (the staged artifact below is published)
+      - name: Stage static site
+        run: |
+          mkdir -p _site
+          cp index.html favicon.svg og-image.svg _site/
+          touch _site/.nojekyll
+          ls -lh _site/
+
+      # If Pages is not enabled at all, skip the deploy instead of a red build.
       - name: Check whether GitHub Pages is enabled
         id: pages
         run: |
@@ -39,7 +52,7 @@ jobs:
           echo "Pages API returned HTTP $code"
           if [ "$code" = "404" ]; then
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=GitHub Pages is off::Enable it in Settings → Pages → Source: GitHub Actions, then re-run this workflow."
+            echo "::notice title=GitHub Pages is off::Enable it in Settings → Pages, then re-run this workflow."
           else
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           fi
@@ -54,7 +67,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         if: steps.pages.outputs.enabled == 'true'
         with:
-          path: landing
+          path: _site
 
       - id: deployment
         if: steps.pages.outputs.enabled == 'true'

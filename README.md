@@ -123,7 +123,7 @@ docker run -p 3000:3000 \
 
 Подробная пошаговка, переменные окружения и чек-лист перед запуском: **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**.
 
-🌐 **Лендинг** автоматически публикуется на GitHub Pages из [`landing/`](landing/) при пуше в `main` ([workflow](.github/workflows/pages.yml)). Включите Pages в `Settings → Pages → Source: GitHub Actions`.
+🌐 **Лендинг** — это один автономный [`index.html`](index.html) в корне (без внешних зависимостей). Публикуется на GitHub Pages при любом режиме: **Deploy from a branch** (Jekyll отключён через `.nojekyll`) или **GitHub Actions** ([workflow](.github/workflows/pages.yml)). Включите Pages в `Settings → Pages`.
 
 ---
 

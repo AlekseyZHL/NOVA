@@ -65,7 +65,7 @@ make ci
 | Поменять UI | `public/index.html`, `public/styles.css`, `public/app.js` |
 | Добавить endpoint | `server/routes/api.js`, `docs/API.md` |
 | Улучшить деплой | `Dockerfile`, `docs/DEPLOYMENT.md`, `.github/workflows/` |
-| Обновить лендинг | `landing/` |
+| Обновить лендинг | `index.html`, `favicon.svg`, `og-image.svg` (автономная страница) |
 
 ## Идеи, которые особенно приветствуются
 

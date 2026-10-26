@@ -10,7 +10,6 @@ vault.enc
 db.json
 exports
 docs
-landing
 assets
 tests
 coverage

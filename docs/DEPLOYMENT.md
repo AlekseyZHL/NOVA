@@ -220,7 +220,7 @@ wallet.example.com {
 |---|---|
 | [`ci.yml`](../.github/workflows/ci.yml) | Node 20 и 22: `npm ci`, secret scan, `node --check`, 48 тестов с живым сервером |
 | [`codeql.yml`](../.github/workflows/codeql.yml) | Статический анализ JS/TS, еженедельно |
-| [`pages.yml`](../.github/workflows/pages.yml) | Публикует [`landing/`](../landing/) на GitHub Pages |
+| [`pages.yml`](../.github/workflows/pages.yml) | Публикует автономный [`index.html`](../index.html) на GitHub Pages (режим branch и Actions) |
 | [`release.yml`](../.github/workflows/release.yml) | На теге `v*` собирает архивы без секретов и создаёт Release |
 
-Чтобы включить Pages: `Settings → Pages → Source: GitHub Actions`.
+Pages работает в обоих режимах: `Source: Deploy from a branch` (main / root, Jekyll отключён `.nojekyll`) и `Source: GitHub Actions`. Откройте `Settings → Pages` и выберите любой.

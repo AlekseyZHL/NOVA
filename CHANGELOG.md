@@ -7,7 +7,7 @@
 - **GitHub-репозиторий**: README с бейджами и Mermaid-схемой, `LICENSE` (MIT + дисклеймер), `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, шаблоны issue/PR, Dependabot.
 - **CI/CD**: `.github/workflows/ci.yml` (Node 20/22, 48 тестов, secret scan), `codeql.yml`, `pages.yml`, `release.yml` (архивы без секретов → GitHub Releases).
 - **Деплой**: `Dockerfile` (Alpine, non-root, healthcheck), `docker-compose.yml`, `docker-entrypoint.sh`, `render.yaml`, `railway.json`, `fly.toml`, `Procfile`, `docs/DEPLOYMENT.md`.
-- **Лендинг** на GitHub Pages: `landing/index.html` — полностью автономная страница с интерактивным демо интерфейса кошелька.
+- **Лендинг** на GitHub Pages: автономный `index.html` в корне с интерактивным демо интерфейса кошелька.
 - **Утилиты**: `Makefile`, `scripts/check-secrets.sh`, `scripts/check-syntax.js`, `.editorconfig`, `.nvmrc`, `.dockerignore`.
 - Версия теперь берётся из `package.json` (`server/version.js`) и отдаётся в `/api/health`.
 
@@ -19,6 +19,8 @@
 - Сервер больше не печатает stack trace для ожидаемого `503 BOT_TOKEN is not configured`.
 
 ### Изменено
+
+- **Pages:** лендинг перенесён в корневой `index.html` + `.nojekyll`, чтобы Jekyll-сборка из ветки не перезаписывала его README.
 
 - Архивы релизов больше не коммитятся (`exports/` в `.gitignore`) — они собираются CI и прикрепляются к GitHub Releases.
 
