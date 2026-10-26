@@ -11,6 +11,13 @@
 - **Утилиты**: `Makefile`, `scripts/check-secrets.sh`, `scripts/check-syntax.js`, `.editorconfig`, `.nvmrc`, `.dockerignore`.
 - Версия теперь берётся из `package.json` (`server/version.js`) и отдаётся в `/api/health`.
 
+### Исправлено
+
+- `loadTgSdk()` больше не блокирует загрузку в обычном браузере/CI: SDK ждём только внутри Telegram (по `tgWebAppData` / `tgWebAppVersion` в URL). Таймаут снижен с 3.5 с до 2 с.
+- UI-тесты и тест входа теперь **поллят** готовность приложения вместо фиксированного `sleep(4200)` — устранена гонка на холодном CI-раннере (8/16 падений).
+- `Pages` workflow корректно пропускает деплой, если GitHub Pages ещё не включён, вместо падения.
+- Сервер больше не печатает stack trace для ожидаемого `503 BOT_TOKEN is not configured`.
+
 ### Изменено
 
 - Архивы релизов больше не коммитятся (`exports/` в `.gitignore`) — они собираются CI и прикрепляются к GitHub Releases.

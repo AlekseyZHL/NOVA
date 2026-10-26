@@ -36,7 +36,7 @@ app.get('*', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
 
 app.use((err, _req, res, _next) => {
   const status = err.status || 500;
-  if (status >= 500) console.error('[server]', err);
+  if (status === 500) console.error('[server]', err);
   res.status(status).json({ error: status === 500 ? 'Внутренняя ошибка сервера' : err.message });
 });
 

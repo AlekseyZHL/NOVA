@@ -99,11 +99,16 @@ const btnBusy = (el, on, text) => {
 function loadTgSdk() {
   return new Promise(resolve => {
     if (window.Telegram?.WebApp) return resolve();
+    // Telegram adds these params to the Web App URL. In a plain browser (or CI)
+    // there is no reason to block the boot sequence waiting for the SDK.
+    const hash = location.hash || '';
+    const inTelegram = /(?:^|[#&])tgWebAppData=/.test(hash) || /(?:^|[#&])tgWebAppVersion=/.test(hash);
+    if (!inTelegram) return resolve();
     const s = document.createElement('script');
     s.src = 'https://telegram.org/js/telegram-web-app.js'; s.async = true;
     let done = false; const fin = () => { if (!done) { done = true; resolve(); } };
     s.onload = fin; s.onerror = fin; document.head.appendChild(s);
-    setTimeout(fin, 3500);
+    setTimeout(fin, 2000);
   });
 }
 /* Telegram дублирует initData в URL-фрагменте (#tgWebAppData=...).

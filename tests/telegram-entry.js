@@ -45,7 +45,13 @@ process.on('unhandledRejection', e => errors.push('unhandledRejection: ' + (e?.m
 process.on('uncaughtException', e => errors.push('uncaughtException: ' + e.message));
 
 await import('../public/app.js');
-await new Promise(r => setTimeout(r, 4300));
+
+// Poll until the app has actually attempted Telegram auth (cold CI can be slow).
+for (let i = 0; i < 100; i++) {
+  if (calls.some(c => c.url.includes('/auth/telegram'))) break;
+  await new Promise(r => setTimeout(r, 120));
+}
+await new Promise(r => setTimeout(r, 600));
 
 let pass = 0, fail = 0;
 const ok = (name, cond, detail = '') => {

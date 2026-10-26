@@ -32,13 +32,21 @@ const errors = [];
 process.on('unhandledRejection', e => errors.push('unhandledRejection: ' + (e?.message || e)));
 process.on('uncaughtException', e => errors.push('uncaughtException: ' + e.message));
 
-await import('../public/app.js');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-await sleep(4200);
-
 const $ = s => window.document.querySelector(s);
 const $$ = s => [...window.document.querySelectorAll(s)];
 const click = el => el && el.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+
+await import('../public/app.js');
+
+// Poll instead of a fixed sleep: on a cold CI runner the SDK timeout plus the
+// first API round-trips can take several seconds. Max wait ~12 s.
+for (let i = 0; i < 100; i++) {
+  if (!$('#boot') || $('#boot').classList.contains('gone')) break;
+  await sleep(120);
+}
+await sleep(300);
+
 let pass = 0, fail = 0;
 const ok = (name, cond, detail = '') => {
   if (cond) pass++; else fail++;
